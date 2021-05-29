@@ -18,12 +18,12 @@ namespace Maily
 
         public void SMTP_SSL_set(bool SSL)
         {
-            SMTPSSl = SSL;
+            SMTPSSL = SSL;
         }
 
         public void IMAP_SSL_set(bool SSL)
         {
-            SMTPSSl = SSL;
+            SMTPSSL = SSL;
         }
 
         public void user_mail_set(string user_mail)

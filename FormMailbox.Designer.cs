@@ -41,6 +41,7 @@ namespace Maily
             this.button_mailbox_settings = new System.Windows.Forms.Button();
             this.button_program_description = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.button_delete_mail = new System.Windows.Forms.Button();
             this.button_send_mail = new System.Windows.Forms.Button();
             this.button_attach_new_file = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
@@ -186,6 +187,7 @@ namespace Maily
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.button_delete_mail);
             this.groupBox3.Controls.Add(this.button_send_mail);
             this.groupBox3.Controls.Add(this.button_attach_new_file);
             this.groupBox3.Controls.Add(this.label5);
@@ -206,26 +208,40 @@ namespace Maily
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Данные письма";
             // 
+            // button_delete_mail
+            // 
+            this.button_delete_mail.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.button_delete_mail.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.button_delete_mail.Location = new System.Drawing.Point(443, 365);
+            this.button_delete_mail.Name = "button_delete_mail";
+            this.button_delete_mail.Size = new System.Drawing.Size(108, 23);
+            this.button_delete_mail.TabIndex = 15;
+            this.button_delete_mail.Text = "Удалить письмо";
+            this.button_delete_mail.UseVisualStyleBackColor = false;
+            this.button_delete_mail.Click += new System.EventHandler(this.button_delete_mail_Click);
+            // 
             // button_send_mail
             // 
+            this.button_send_mail.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.button_send_mail.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.button_send_mail.Location = new System.Drawing.Point(6, 464);
             this.button_send_mail.Name = "button_send_mail";
             this.button_send_mail.Size = new System.Drawing.Size(545, 36);
             this.button_send_mail.TabIndex = 17;
             this.button_send_mail.Text = "Отправить";
-            this.button_send_mail.UseVisualStyleBackColor = true;
+            this.button_send_mail.UseVisualStyleBackColor = false;
             this.button_send_mail.Click += new System.EventHandler(this.button_send_mail_Click);
             // 
             // button_attach_new_file
             // 
-            this.button_attach_new_file.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.button_attach_new_file.Location = new System.Drawing.Point(443, 430);
+            this.button_attach_new_file.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.button_attach_new_file.Location = new System.Drawing.Point(443, 438);
             this.button_attach_new_file.Name = "button_attach_new_file";
-            this.button_attach_new_file.Size = new System.Drawing.Size(108, 31);
+            this.button_attach_new_file.Size = new System.Drawing.Size(108, 23);
             this.button_attach_new_file.TabIndex = 16;
             this.button_attach_new_file.Text = "Прикрепить";
             this.button_attach_new_file.UseVisualStyleBackColor = true;
+            this.button_attach_new_file.Click += new System.EventHandler(this.button_attach_new_file_Click);
             // 
             // label5
             // 
@@ -247,13 +263,14 @@ namespace Maily
             // 
             // button_delete_attached_files
             // 
-            this.button_delete_attached_files.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.button_delete_attached_files.Location = new System.Drawing.Point(443, 398);
+            this.button_delete_attached_files.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.button_delete_attached_files.Location = new System.Drawing.Point(443, 414);
             this.button_delete_attached_files.Name = "button_delete_attached_files";
-            this.button_delete_attached_files.Size = new System.Drawing.Size(108, 31);
+            this.button_delete_attached_files.Size = new System.Drawing.Size(108, 23);
             this.button_delete_attached_files.TabIndex = 15;
             this.button_delete_attached_files.Text = "Открепить";
             this.button_delete_attached_files.UseVisualStyleBackColor = true;
+            this.button_delete_attached_files.Click += new System.EventHandler(this.button_delete_attached_files_Click);
             // 
             // label4
             // 
@@ -266,10 +283,10 @@ namespace Maily
             // 
             // button_download_attached_files
             // 
-            this.button_download_attached_files.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.button_download_attached_files.Location = new System.Drawing.Point(443, 366);
+            this.button_download_attached_files.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.button_download_attached_files.Location = new System.Drawing.Point(443, 390);
             this.button_download_attached_files.Name = "button_download_attached_files";
-            this.button_download_attached_files.Size = new System.Drawing.Size(108, 31);
+            this.button_download_attached_files.Size = new System.Drawing.Size(108, 23);
             this.button_download_attached_files.TabIndex = 14;
             this.button_download_attached_files.Text = "Скачать";
             this.button_download_attached_files.UseVisualStyleBackColor = true;
@@ -325,8 +342,10 @@ namespace Maily
             // 
             // FormMailbox
             // 
+            this.AcceptButton = this.button_send_mail;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ClientSize = new System.Drawing.Size(992, 588);
             this.Controls.Add(this.groupBox3);
@@ -381,5 +400,6 @@ namespace Maily
         private System.Windows.Forms.Button button_send_mail;
         private System.Windows.Forms.Button button_attach_new_file;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.Button button_delete_mail;
     }
 }
