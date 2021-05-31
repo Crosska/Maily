@@ -71,6 +71,7 @@ namespace Maily
             // 
             this.textBox_mail_password.Location = new System.Drawing.Point(6, 90);
             this.textBox_mail_password.Name = "textBox_mail_password";
+            this.textBox_mail_password.PasswordChar = '*';
             this.textBox_mail_password.Size = new System.Drawing.Size(260, 23);
             this.textBox_mail_password.TabIndex = 4;
             this.textBox_mail_password.Text = "tempmailbox";

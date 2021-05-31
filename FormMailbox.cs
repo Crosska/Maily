@@ -24,32 +24,39 @@ namespace Maily
         MailAccount current_account;
 
         IList<UniqueId> UIDS;
+        List<MailAccount> accounts;
 
         bool mail_new = false;
 
         /// <summary>
         ///  Конструктор формы
         /// </summary>
-        public FormMailbox(string client_mail, ImapClient client_imap, SmtpClient client_smtp)
+        public FormMailbox(List<MailAccount> accounts)
         {
             InitializeComponent();
-            current_account = new MailAccount();
-            current_account.IMAPClient_set(client_imap);
-            current_account.SMTPClient_set(client_smtp);
-            current_account.user_mail_set(client_mail);
 
+            this.accounts = accounts;
+            current_account = find_active_account();
             current_account_mail.Text = current_account.user_mail_get();
-            listbox_mail_boxes.SelectedIndex = 0;
 
+            listbox_mail_boxes.SelectedIndex = 0;
             webviewer.Height = 225;
             webviewer.Width = 542;
             webviewer.Location = new Point(6, 129);
             groupBox3.Controls.Add(webviewer);
-
             richtextbox.Height = 225;
             richtextbox.Width = 542;
             richtextbox.Location = new Point(6, 129);
             groupBox3.Controls.Add(richtextbox);
+        }
+
+        private MailAccount find_active_account()
+        {
+            for (int i = 0; i < accounts.Count; i++)
+            {
+                if (accounts[i].active_get()) return accounts[i];
+            }
+            return null;
         }
 
         /// <summary>
@@ -85,6 +92,7 @@ namespace Maily
                     button_delete_attached_files.Enabled = false;
                     button_download_attached_files.Enabled = true;
                     button_send_mail.Enabled = false;
+                    button_delete_mail.Enabled = true;
 
                     richtextbox.Visible = false;
                     webviewer.Visible = true;
@@ -98,6 +106,7 @@ namespace Maily
                             button_delete_attached_files.Enabled = false;
                             button_download_attached_files.Enabled = true;
                             button_send_mail.Enabled = false;
+                            button_delete_mail.Enabled = true;
 
                             richtextbox.Visible = false;
                             webviewer.Visible = true;
@@ -107,6 +116,7 @@ namespace Maily
                             button_delete_attached_files.Enabled = true;
                             button_download_attached_files.Enabled = false;
                             button_send_mail.Enabled = true;
+                            button_delete_mail.Enabled = true;
 
                             richtextbox.Visible = true;
                             webviewer.Visible = false;
@@ -116,6 +126,7 @@ namespace Maily
                             button_delete_attached_files.Enabled = false;
                             button_download_attached_files.Enabled = false;
                             button_send_mail.Enabled = false;
+                            button_delete_mail.Enabled = true;
 
                             richtextbox.Visible = false;
                             webviewer.Visible = true;
@@ -125,6 +136,7 @@ namespace Maily
                             button_delete_attached_files.Enabled = false;
                             button_download_attached_files.Enabled = false;
                             button_send_mail.Enabled = false;
+                            button_delete_mail.Enabled = true;
 
                             webviewer.Visible = false;
                             richtextbox.Visible = false;
@@ -241,7 +253,19 @@ namespace Maily
         /// </summary>
         private void button_mailbox_settings_Click(object sender, EventArgs e)
         {
+            FormSettings settings = new FormSettings(accounts);
 
+            var result = settings.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                accounts = settings.accounts;
+                current_account = find_active_account();
+                if (current_account == null) Application.Exit();
+                current_account_mail.Text = current_account.user_mail_get();
+                listbox_mail_boxes.SelectedIndex = 1;
+                listbox_mail_boxes.SelectedIndex = 0;
+
+            }
         }
 
         /// <summary>
@@ -261,6 +285,7 @@ namespace Maily
             button_delete_attached_files.Enabled = true;
             button_download_attached_files.Enabled = false;
             button_send_mail.Enabled = true;
+            button_delete_mail.Enabled = false;
 
             mail_new = true;
             textbox_receiver_mail.Clear();
@@ -401,33 +426,73 @@ namespace Maily
 
         private void button_delete_mail_Click(object sender, EventArgs e)
         {
-            DialogResult dialogResult = MessageBox.Show("Вы уверены, что хотите удалить данное письмо?",
-                       "Подтверждение",
-                       MessageBoxButtons.YesNo,
-                       MessageBoxIcon.Information,
-                       MessageBoxDefaultButton.Button1,
-                       MessageBoxOptions.DefaultDesktopOnly);
-            if (dialogResult == DialogResult.Yes)
+            if (listbox_mail_in_box.SelectedIndex >= 0)
             {
-                string selected_mailbox = listbox_mail_boxes.SelectedItem.ToString(); // Сохранение выбранного названия раздела
-                if (selected_mailbox.Equals("Входящие"))
+                if (listbox_mail_boxes.SelectedItem.ToString().Equals("Черновики"))
                 {
-                    selected_mailbox = "INBOX";
+                    DialogResult dialogResult = MessageBox.Show("Вы уверены, что хотите удалить навсегда данное письмо?",
+                                           "Удаление письма",
+                                           MessageBoxButtons.YesNo,
+                                           MessageBoxIcon.Information,
+                                           MessageBoxDefaultButton.Button1,
+                                           MessageBoxOptions.DefaultDesktopOnly);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        string selected_mailbox = listbox_mail_boxes.SelectedItem.ToString(); // Сохранение выбранного названия раздела
+                        selected_mailbox = "[Gmail]/" + selected_mailbox;
+                        var folder = current_account.IMAPClient_get().GetFolder(selected_mailbox);
+                        folder.Open(FolderAccess.ReadWrite);
+                        IList<UniqueId> UIDS = new List<UniqueId>() { folder.Search(SearchQuery.All)[listbox_mail_in_box.SelectedIndex] };
+                        folder.AddFlags(listbox_mail_in_box.SelectedIndex, MessageFlags.Deleted, true);
+
+                        folder.Expunge();
+                        folder.Close();
+                    }
+                    else if (dialogResult == DialogResult.No)
+                    {
+                    }
                 }
                 else
                 {
-                    selected_mailbox = "[Gmail]/" + selected_mailbox;
-                }
-                var folder = current_account.IMAPClient_get().GetFolder(selected_mailbox);
-                folder.Open(FolderAccess.ReadWrite);
-                IList<UniqueId> UIDS = new List<UniqueId>() { folder.Search(SearchQuery.All)[listbox_mail_in_box.SelectedIndex] };
-                folder.AddFlags(listbox_mail_in_box.SelectedIndex, MessageFlags.Deleted, true);
+                    DialogResult dialogResult = MessageBox.Show("Вы уверены, что хотите переместить письмо в корзину?",
+                                           "Отправка письма в корзину",
+                                           MessageBoxButtons.YesNo,
+                                           MessageBoxIcon.Information,
+                                           MessageBoxDefaultButton.Button1,
+                                           MessageBoxOptions.DefaultDesktopOnly);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        string selected_mailbox = listbox_mail_boxes.SelectedItem.ToString(); // Сохранение выбранного названия раздела
+                        if (selected_mailbox.Equals("Входящие"))
+                        {
+                            selected_mailbox = "INBOX";
+                        }
+                        else
+                        {
+                            selected_mailbox = "[Gmail]/" + selected_mailbox;
+                        }
 
-                //folder.Expunge();
-                folder.Close();
+                        var folder = current_account.IMAPClient_get().GetFolder(selected_mailbox);
+                        var folder_destination = current_account.IMAPClient_get().GetFolder("[Gmail]/Черновики");
+                        folder.Open(FolderAccess.ReadWrite);
+                        UniqueId UID = folder.Search(SearchQuery.All)[listbox_mail_in_box.SelectedIndex];
+                        folder.MoveTo(UID, folder_destination);
+                        folder.Close();
+                    }
+                    else if (dialogResult == DialogResult.No)
+                    {
+                    }
+                }
             }
-            else if (dialogResult == DialogResult.No)
+            else
             {
+                MessageBox.Show(
+                       "Сначала выберите какое-либо письмо из списка",
+                       "Предупреждение",
+                       MessageBoxButtons.OK,
+                       MessageBoxIcon.Information,
+                       MessageBoxDefaultButton.Button1,
+                       MessageBoxOptions.DefaultDesktopOnly);
             }
         }
     }

@@ -12,6 +12,7 @@ using System.Windows.Forms;
 
 namespace Maily
 {
+
     public partial class LoginForm : Form
     {
 
@@ -49,6 +50,9 @@ namespace Maily
 
         private void button_Log_In_Click(object sender, EventArgs e)
         {
+            List<MailAccount> account_list = new List<MailAccount>();
+            MailAccount new_acc = new MailAccount();
+
             if (checkBox_standart_settings.Checked)
             {
                 IMAP_Adress = "imap.gmail.com";
@@ -96,7 +100,16 @@ namespace Maily
                     client_imap.Authenticate(textBox_mail_adress.Text, textBox_mail_password.Text);
                     client_smtp.Authenticate(textBox_mail_adress.Text, textBox_mail_password.Text);
 
-                    FormMailbox MailBox = new FormMailbox(textBox_mail_adress.Text, client_imap, client_smtp);
+                    new_acc.IMAPClient_set(client_imap);
+                    new_acc.SMTPClient_set(client_smtp);
+                    new_acc.user_mail_set(textBox_mail_adress.Text);
+                    new_acc.user_password_set(textBox_mail_password.Text);
+                    new_acc.IMAP_SSL_set(IMAP_SSL);
+                    new_acc.SMTP_SSL_set(SMTP_SSL);
+                    new_acc.active_set(true);
+                    account_list.Add(new_acc);
+
+                    FormMailbox MailBox = new FormMailbox(account_list);
                     this.Visible = false;
                     MailBox.ShowDialog();
                 }
@@ -104,7 +117,7 @@ namespace Maily
                 {
                     MessageBox.Show(
                     "Произошла ошибка при входе в аккаунт почты, проверьте введенную почту и пароль на наличие ошибок.",
-                    "Ошибка", 
+                    "Ошибка",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error,
                     MessageBoxDefaultButton.Button1,
@@ -116,7 +129,7 @@ namespace Maily
             {
                 MessageBox.Show(
                     "Произошла ошибка при подключении к серверам почты, проверьте правильность вводимых данных каждого сервера.",
-                    "Ошибка", 
+                    "Ошибка",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error,
                     MessageBoxDefaultButton.Button1,
